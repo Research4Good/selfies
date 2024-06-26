@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on 2024-06-25 
+
+@author: r4g
+"""
+
 from sklearn import metrics
 from sklearn.metrics import average_precision_score, fbeta_score, make_scorer
 
@@ -14,6 +22,10 @@ from optuna.integration import CatBoostPruningCallback
 
 import xgboost
 from xgboost import XGBClassifier
+import joblib 
+
+
+# ===================== define custom scorers =====================
 
 avg_pres_score_pos = make_scorer(average_precision_score,
                              greater_is_better = True,
@@ -25,10 +37,8 @@ fbeta_scorer = make_scorer(fbeta_score,
                           greater_is_better = True,
                           pos_label=0)
 
-
-
-class myOptuna:
-    
+# ===================== myOptuna  =====================
+class myOptuna:    
     def __init__(self, name, X_train, y_train, X_val, y_val ):
         self.name = name         
         self.X_train = X_train
@@ -61,10 +71,8 @@ class myOptuna:
 
         model.fit(self.X_train, self.y_train, eval_set=[(self.X_val, self.y_val)], early_stopping_rounds=100,)    
         y_pred = model.predict(self.X_val)
-        pred_labels = np.rint(y_pred)
-        accuracy = accuracy_score(self.y_val, pred_labels)
-
-        return score 
+        pred_labels = np.rint(y_pred)        
+        return accuracy_score(self.y_val, pred_labels) 
     
 
 
@@ -79,30 +87,27 @@ class myOptuna:
             ),
             "eval_metric": "Accuracy",
         }
-
         if param["bootstrap_type"] == "Bayesian":
             param["bagging_temperature"] = trial.suggest_float("bagging_temperature", 0, 10)
         elif param["bootstrap_type"] == "Bernoulli":
             param["subsample"] = trial.suggest_float("subsample", 0.1, 1, log=True)
 
-        model = catboost.CatBoostClassifier(**param)     
+        model = catboost.CatBoostClassifier(**param)    
         
         model.fit(self.X_train, self.y_train, eval_set=[(self.X_val, self.y_val)], early_stopping_rounds=100,)    
         y_pred = model.predict(self.X_val)
         pred_labels = np.rint(y_pred)
-        accuracy = accuracy_score(self.y_val, pred_labels)
         
         # metric  to optimize
-        # score = mean_squared_error(y_test, y_pred)        
-        return score 
+        #  mean_squared_error(y_test, y_pred)        
+        return accuracy_score(self.y_val, pred_labels) 
     
 
     def run(self,n_trials=200):
         study = optuna.create_study(direction='maximize', sampler=optuna.samplers.RandomSampler(seed=42))
+      
         if self.name == 'cat':
-            study.optimize(self.cat_objective, n_trials=n_trials)
-            
-
+            study.optimize(self.cat_objective, n_trials=n_trials)            
         elif self.name == 'rf':
             study.optimize(self.rf_objective, n_trials=n_trials)                         
 
@@ -128,14 +133,15 @@ class myOptuna:
             model.fit( X_train, y_train, eval_set=[(self.X_val, self.y_val)], early_stopping_rounds=100 )
         return model
 
-met = 'cat'
-my_opt = myOptuna( met, X_train, y_train, X_val, y_val )
-model = my_opt.run(n_trials=2)
 
-import joblib 
-
-pref = f"{met}_offset{O}"
-print('saving to', pref)
-
-joblib.dump( model, pref + '.joblib', compress=3)  # compression is ON!
-joblib.dump( params,  pref + '_params.txt' )  # compression is ON!
+# run as a script
+if __name__ == "__main__":
+  met = 'cat'
+  my_opt = myOptuna( met, X_train, y_train, X_val, y_val )
+  model = my_opt.run(n_trials=2)
+  
+  pref = f"{met}_offset{O}"
+  print('saving to', pref)
+  
+  joblib.dump( model, pref + '.joblib', compress=3)  # compression is ON!
+  joblib.dump( params,  pref + '_params.txt' )  # compression is ON!
