@@ -8,6 +8,9 @@ data_dir = '/kaggle/input/smilesx-demo/SMILES-X/data/'
 # data from competition 
 train_path = '/kaggle/input/leash-BELKA/train.parquet'
 test_path = '//kaggle/input/leash-BELKA/test.parquet'
+test_file = '/kaggle/input/leash-BELKA/test.csv'
+output_file = 'submission.csv'  # Specify the path and filename for the output file
+
 
 # !conda env export | grep -v "^prefix: " > environment.yml 
 
@@ -1164,4 +1167,26 @@ def infer(model, data_smiles, data_extra=None, augment=False, check_smiles: bool
 
     return preds
 
+
+
+
+
+for i, df_test in enumerate(pd.read_csv(test_file,usecols=['id','protein_name']+F, chunksize=100000 )):
+    if 1:
+        df_test['protein_code1'] = (df_test['protein_name'] == 'BRD4').astype(np.int8)
+        df_test['protein_code2'] = (df_test['protein_name'] == 'HSA' ).astype(np.int8)
+        df_test['protein_code3'] = (df_test['protein_name'] == 'sEH' ).astype(np.int8)
+
+        preds = infer(  model=fitted_model,
+                        data_smiles=df_test[ F ],
+                        data_extra=df_test[ E ],
+                        augment=False,
+                        check_smiles=False,
+                        log_verbose=False)        
+
+        output_df = pd.DataFrame({'id': df_test['id'], 'binds': preds['mean']  })        
+        output_df.to_csv(output_file, index=False, mode='a', header=not os.path.exists(output_file))
+
+        print( f'Written submission output for batch {i}' )
+        print( output_df.head(10) )
 
