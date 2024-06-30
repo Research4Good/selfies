@@ -1,18 +1,5 @@
 import sys, os; sys.path.append( '/kaggle/input/smilesx-demo/SMILES-X/')
 
-# demo data from SMILESX
-data_dir = '/kaggle/input/smilesx-demo/SMILES-X/data/'
-
-# data from competition 
-train_path = '/kaggle/input/leash-BELKA/train.parquet'
-test_path = '//kaggle/input/leash-BELKA/test.parquet'
-
-!conda env export | grep -v "^prefix: " > environment.yml 
-
-
-test_file = '/kaggle/input/leash-BELKA/test.csv'
-output_file = 'submission.csv'  # Specify the path and filename for the output file
-
 # Load packages
 
 import math
@@ -2065,10 +2052,6 @@ def infer(model, data_smiles, data_extra=None, augment=False, check_smiles: bool
 
 
 
-#  Compile submission file
-
-test_file = '/kaggle/input/leash-BELKA/test.csv'
-output_file = 'submission.csv'  # Specify the path and filename for the output file
 
 for i, df_test in enumerate(pd.read_csv(test_file,usecols=['id','protein_name']+F, chunksize=100000 )):
     
@@ -2091,6 +2074,3 @@ for i, df_test in enumerate(pd.read_csv(test_file,usecols=['id','protein_name']+
     print( f'Written submission output for batch {i}' )
     print( output_df.head(10) )
 
-
-
-print( output_df.sample(10).head(6) )
