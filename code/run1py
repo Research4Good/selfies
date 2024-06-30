@@ -891,6 +891,58 @@ def sigma_classification_metrics(true, pred, err_pred, n_mc=1000):
     return sigma.ravel()
 
 
+field_names = ['protein_code1','protein_code2','protein_code3', 'molecule_smiles','buildingblock1_smiles','buildingblock2_smiles', 'buildingblock3_smiles'] 
+y = df1[['binds']] #.tolist()
+
+# Split the development set into train and validation subsets
+Y,X = {},{}
+X['trn'], X['val'], Y['trn'], Y['val'] = train_test_split( df1[ field_names ], y, test_size=0.2, random_state=42)
+Y['trn'].head()
+
+embed_bounds = [8, 16] # embedding size
+lstm_bounds = [8, 16] # number of units in the LSTM layer
+tdense_bounds = [8, 16] # number of units in the dense layer
+bs_bounds = [64, 128] # batch size
+lr_bounds = [2., 2.5, 3., 3.5] # learning rate
+
+data_name = 'Test'
+data_label = 'Test label' # will show on plots
+data_units = 'units' # will show on plots
+
+            
+import tensorflow as tf
+devices = tf.config.list_logical_devices('GPU')
+NGPUS=len(devices)
+print( '\n\n\n>>>>>>>>>>>>>>NGPUs',NGPUS )
+
+data_label='binded?'
+
+main(data_smiles=X['trn'][ F ],    # SMILES input
+          data_extra=X['trn'][ E ],                # Aux input 
+          data_prop= Y['trn'],                     # prediction
+          
+          data_label=data_label,
+          smiles_concat=False,                     # was true in demo 
+          geomopt_mode='off',                      #  'off' <-- was off in demo code: Zero-cost geometry optimization
+          bayopt_mode='off',                       # Bayesian optimization
+          train_mode='on',                         # Train
+          model_type = 'classification',           # 'regression'
+          scale_output = True,          
+          k_fold_number=NFOLDS,                         # Number of cross-validation splits
+          n_runs=NRUNS,                                # Number of runs per fold
+          check_smiles=True,                       # Verify SMILES validity via RDKit
+          augmentation=AUG,                        # Augment the data or not
+          bayopt_n_rounds=2,
+          bayopt_n_epochs=2,                       # 5
+          bayopt_n_runs=2,                         # 2 
+          n_gpus=NGPUS,
+          n_epochs=NEPOCHS,                              # 10
+          log_verbose=True,                        # To send print outs both to the file and console
+          train_verbose=True,                     # Show model training progress
+          bs_bounds=bs_bounds,          lr_bounds=lr_bounds,          embed_bounds=embed_bounds,          lstm_bounds=lstm_bounds,          tdense_bounds=tdense_bounds,
+          data_name=data_name,          data_units=data_units,     
+    )        
+
 
 class LoadModel:    
     def __init__(self,
