@@ -16,3 +16,12 @@ try:
 except:
   gpus = tf.config.experimental.list_physical_devices('GPU')  
 ```
+
+
+## Building LGB with GPU enabled
+``` # being tested on gra
+git clone --recursive https://github.com/microsoft/LightGBM.git
+cd LightGBM
+sh ./build-python.sh install --gpu
+
+```
