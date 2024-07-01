@@ -1731,7 +1731,14 @@ def main(data_smiles,
 embed_bounds = [8, 16] # embedding size
 lstm_bounds = [8, 16] # number of units in the LSTM layer
 tdense_bounds = [8, 16] # number of units in the dense layer
-bs_bounds = [64, 128] # batch size
+
+embed_bounds = [256] # embedding size
+lstm_bounds = [512] # number of units in the LSTM layer
+tdense_bounds = [128] # number of units in the dense layer
+
+
+bs_bounds = [128,256] # batch size
+
 lr_bounds = [2., 2.5, 3., 3.5] # learning rate
 
 data_name = 'Test'
@@ -1760,7 +1767,7 @@ main(data_smiles=X['trn'][ F ],    # SMILES input
           scale_output = True,          
           k_fold_number=NFOLDS,                         # Number of cross-validation splits
           n_runs=NRUNS,                                # Number of runs per fold
-          check_smiles=True,                       # Verify SMILES validity via RDKit
+          check_smiles=False,                       # Verify SMILES validity via RDKit
           augmentation=AUG,                        # Augment the data or not
           bayopt_n_rounds=2,
           bayopt_n_epochs=2,                       # 5
@@ -2052,8 +2059,8 @@ def infer(model, data_smiles, data_extra=None, augment=False, check_smiles: bool
 
 
 
-
-for i, df_test in enumerate(pd.read_csv(test_file,usecols=['id','protein_name']+F, chunksize=100000 )):
+# usecols=['id','protein_name']+F,
+for i, df_test in enumerate(pd.read_csv(test_file, chunksize=100000 )):
     
     df_test['protein_code1'] = (df_test['protein_name'] == 'BRD4').astype(np.int8)
     df_test['protein_code2'] = (df_test['protein_name'] == 'HSA' ).astype(np.int8)
@@ -2064,13 +2071,22 @@ for i, df_test in enumerate(pd.read_csv(test_file,usecols=['id','protein_name']+
                     data_extra=df_test[ E ],
                     augment=AUG,
                     check_smiles=False,
-                    log_verbose=False)        
+                    log_verbose=True)        
 
     output_df = pd.DataFrame({'id': df_test['id'], 'binds': preds['mean']  })        
-    
+    try:
+        all_df = pd.DataFrame({'id': df_test['id'],  'p1': df_test['protein_code1'], 'p2': df_test['protein_code2'], 'p3': df_test['protein_code3'], 'binds': preds['mean'], 'molecule_smiles': df_test['molecule_smiles']   })        
+    except:
+        pass
+        
     # Save the output DataFrame to a CSV file
     output_df.to_csv(output_file, index=False, mode='a', header=not os.path.exists(output_file))
 
     print( f'Written submission output for batch {i}' )
     print( output_df.head(10) )
 
+try:
+    pritn( '\n\nMissing values?',)
+    print( all_df[all_df.isnull().any(axis=1)]  )
+except:
+    pass
