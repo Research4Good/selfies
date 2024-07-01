@@ -891,20 +891,7 @@ def sigma_classification_metrics(true, pred, err_pred, n_mc=1000):
     return sigma.ravel()
 
 
-field_names = ['protein_code1','protein_code2','protein_code3', 'molecule_smiles','buildingblock1_smiles','buildingblock2_smiles', 'buildingblock3_smiles'] 
-y = df1[['binds']] #.tolist()
-
-# Split the development set into train and validation subsets
-Y,X = {},{}
-X['trn'], X['val'], Y['trn'], Y['val'] = train_test_split( df1[ field_names ], y, test_size=0.2, random_state=42)
-Y['trn'].head()
-
-embed_bounds = [8, 16] # embedding size
-lstm_bounds = [8, 16] # number of units in the LSTM layer
-tdense_bounds = [8, 16] # number of units in the dense layer
-bs_bounds = [64, 128] # batch size
-lr_bounds = [2., 2.5, 3., 3.5] # learning rate
-
+ 
 data_name = 'Test'
 data_label = 'Test label' # will show on plots
 data_units = 'units' # will show on plots
@@ -917,7 +904,8 @@ print( '\n\n\n>>>>>>>>>>>>>>NGPUs',NGPUS )
 
 data_label='binded?'
 
-main(data_smiles=X['trn'][ F ],    # SMILES input
+if 0:
+    main(data_smiles=X['trn'][ F ],    # SMILES input
           data_extra=X['trn'][ E ],                # Aux input 
           data_prop= Y['trn'],                     # prediction
           
