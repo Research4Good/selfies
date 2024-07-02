@@ -55,9 +55,9 @@ except:
 
 ### Kaggle
 
-| Hardware Component |  Release Year | Core Count | Memory | Hours/Week |
+| Hardware Component | Release Year | Core Count | Memory | Hours/Week |
 | :-- | :-- | :-- | :-- |
-| | | | |
+| a | b | c | d |
 
 
 
