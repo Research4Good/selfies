@@ -31,4 +31,11 @@ sh ./build-python.sh install --gpu
 git clone https://github.com/snu-lcbc/atom-in-SMILES
 cd atom-in-SMILES
 python setup.py install
+
+pip install deepchem
 ```
+
+
+## GPU specification
+
+- https://docs.alliancecan.ca/wiki/Using_GPUs_with_Slurm/en
