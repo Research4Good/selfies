@@ -17,6 +17,27 @@ python setup.py install
 pip install deepchem
 ```
 
+### CPU
+
+#### Inspect the specs of each core
+```
+!cat /proc/cpuinfo 
+```
+
+#### RAM 
+```
+!cat /proc/meminfo | grep "MemTotal"
+```
+
+@Kaggle
+```
+Hardware Component	            Release Year	Core Count	      Memory	  Hours/Week
+Intel Xeon CPU 2.00 GHz CPU	    2012	        4 vCPU cores	    32 GB	    Unlimited
+NVIDIA Tesla P100 GPU	          2016	        3584 Cuda cores	  16 GB	    32 h
+Google TPU v3-8	                2018	        8 TPU v3 cores	  128 GB	  20 h
+```
+
+
 ### GPU
 
 <details>
