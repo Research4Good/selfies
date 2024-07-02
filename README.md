@@ -44,8 +44,23 @@ git clone --recursive https://github.com/microsoft/LightGBM.git
 cd LightGBM
 sh ./build-python.sh install --gpu
 ```
+## Padding - efficient
 
+```
+pad_end = lambda a,i=600: a[0:i] if len(a) > i else a + [0] * (i-len(a))
+pad_start = lambda a,i=400: a[0:i] if len(a) > i else [0] * (i-len(a))+a
+```
 
+```
+def center_pad( a, N=500 ):   
+    m = len(a)    
+    n = np.abs(N - m)//2 
+    p = [0]*n+a+[0]*n if m<N else a[n:-n]
+    # uncomment below if all must have exact length N
+    #if (N-len(p))>0:
+    #    p=[0]+p
+    return p  
+```
 
 
 ## Parquet
