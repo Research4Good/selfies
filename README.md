@@ -54,8 +54,12 @@ except:
 
 
 ### Kaggle
- 
-| Hardware Component | Release Year | Core Count | Memory | Hours per Week | | :-- | :-- | :-- | :-- | | Intel Xeon CPU 2.00 GHz CPU | 2012 | 4 vCPU cores | 32 GB | Unlimited | | NVIDIA Tesla P100 GPU | 2016 | 3584 Cuda cores| 16 GB | 30 h | | Google TPU v3-8 | 2018 | 8 TPU v3 cores | 128 GB | 20 h, only 8, so need to wait in the queue |
+
+| Hardware Component | Release Year | Core Count | Memory | Hours per Week |
+| :-- | :-- | :-- | :-- | :-- |
+| Intel Xeon CPU 2.00 GHz CPU | 2012 | 4 vCPU cores | 32 GB | Unlimited |
+| NVIDIA Tesla P100 GPU | 2016 | 3584 Cuda cores| 16 GB | 30 h |
+| Google TPU v3-8 | 2018 | 8 TPU v3 cores | 128 GB | 20 h, only 8, so need to wait in the queue |
 
 ### LGB with GPU enabled
 ``` # did not work on gra 2024-07-01
