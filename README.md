@@ -29,16 +29,6 @@ pip install deepchem
 !cat /proc/meminfo | grep "MemTotal"
 ```
 
-@Kaggle
-```
-|Hardware Component	          |  Release Year	|Core Count	     | Memory	 | Hours/Week|
-| :-- | :-- | :-- | :-- |
-|Intel Xeon CPU 2.00 GHz CPU	  |  2012	        |4 vCPU cores	   | 32 GB	  | Unlimited|
-|NVIDIA Tesla P100 GPU	        |  2016	        |3584 Cuda cores|	  16 GB	  | 30 h  |
-|Google TPU v3-8	              |  2018	        |8 TPU v3 cores	|  128 GB	  | 20 h, only 8, so need to wait in the queue|
-```
-
-
 ### GPU
 
 <details>
@@ -61,6 +51,15 @@ except:
 
 </details>
 
+
+
+### Kaggle
+
+|Hardware Component	          |  Release Year	|Core Count	     | Memory	 | Hours/Week|
+| :-- | :-- | :-- | :-- |
+|Intel Xeon CPU 2.00 GHz CPU	  |  2012	        |4 vCPU cores	   | 32 GB	  | Unlimited|
+|NVIDIA Tesla P100 GPU	        |  2016	        |3584 Cuda cores|	  16 GB	  | 30 h  |
+|Google TPU v3-8	              |  2018	        |8 TPU v3 cores	|  128 GB	  | 20 h, only 8, so need to wait in the queue|
 
 
 
