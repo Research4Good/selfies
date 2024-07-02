@@ -6,7 +6,7 @@
 ```
 
 
-## Code snippest
+## Code snippets
 
 ### AIS
 ``` #  gra 2024-07-01
@@ -20,6 +20,7 @@ pip install deepchem
 ### GPU
 
 <details>
+
 
 #### tf
 
@@ -38,12 +39,37 @@ except:
 
 </details>
 
+
+
+
 ### LGB with GPU enabled
 ``` # did not work on gra 2024-07-01
 git clone --recursive https://github.com/microsoft/LightGBM.git
 cd LightGBM
 sh ./build-python.sh install --gpu
 ```
+
+
+
+
+### Majority voting
+```
+class VotingModel(BaseEstimator, ClassifierMixin):
+    def __init__(self, estimators):
+        super().__init__()
+        self.estimators = estimators        
+    def fit(self, X, y=None):
+        return self    
+    def predict(self, X):
+        y_preds = [estimator.predict(X) for estimator in self.estimators]
+        return np.mean(y_preds, axis=0)    
+    def predict_proba(self, X):
+        y_preds = [estimator.predict_proba(X) for estimator in self.estimators]
+        return np.mean(y_preds, axis=0)    
+```
+
+
+
 ## Padding - efficient
 
 ```
