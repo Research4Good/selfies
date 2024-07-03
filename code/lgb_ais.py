@@ -1,35 +1,27 @@
-# source:  https://www.kaggle.com/code/pjbhaumik/0-453-leash-bio-predict-new-medicines-with-belka
-import timeit
-import os, sys
-
+ # source:  https://www.kaggle.com/code/pjbhaumik/0-453-leash-bio-predict-new-medicines-with-belka
 from rdkit import Chem
 from rdkit.Chem import AllChem
-
+from rdkit.Chem import MolFromSmiles, MolToSmiles
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import average_precision_score
 from sklearn.preprocessing import OneHotEncoder
+from sklearn.model_selection import StratifiedKFold
+from sklearn.base import BaseEstimator, ClassifierMixin
 
-import duckdb
+import timeit, os, sys, duckdb, requests 
 import pandas as pd
 import numpy as np
 
 from pyarrow.parquet import ParquetFile
 import pyarrow as pa 
 
-from sklearn.model_selection import StratifiedKFold
-from sklearn.base import BaseEstimator, ClassifierMixin
-
+import tensorflow as tf
 from tqdm.auto import tqdm
-
 import lightgbm as lgb
 import optuna 
 
-from rdkit.Chem import MolFromSmiles, MolToSmiles
 import atomInSmiles
-
 import sentencepiece as spm        
-import sys, os
-import requests 
 
 def center_pad( a, N=500 ):   
     m = len(a)    
@@ -38,7 +30,6 @@ def center_pad( a, N=500 ):
     #if (N-len(p))>0:
     #    p=[0]+p
     return p #np.asarray(p, dtype=np.int32)
-
 
 if feature == 'ais':
     sys.path.append( '/kaggle/working/atom-in-SMILES/atomInSmiles')
@@ -97,25 +88,25 @@ def get_train_set(feature = 'ecfp', N=100, N2=200): # 30000
             pf = ParquetFile(train_path) 
             first_ten_rows = next(pf.iter_batches(batch_size = N+N2)) 
             df = pa.Table.from_batches([first_ten_rows]).to_pandas()             
-        else:
-            if (N+N2)>1000:
-                con = duckdb.connect()    
-            df = con.query(f"""(SELECT {feature_list[feature]}, binds
+        else:            
+            feat_str = ', '.join(feature_list[feature])                        
+            query =f"""(SELECT {feat_str}, binds
                                 FROM parquet_scan('{train_path}')
                                 WHERE binds = 0
                                 and protein_name = '{target}'
                                 ORDER BY random()
                                 LIMIT {N})
                                 UNION ALL
-                                (SELECT {feature_list[feature]}, binds
+                                (SELECT {feat_str}, binds
                                 FROM parquet_scan('{train_path}')
                                 WHERE binds = 1
                                 and protein_name = '{target}'
                                 ORDER BY random()
-                                LIMIT {N2})""").df()               
-            if (N+N2)>1000:
-                print('connection closed')
-                con.close()     
+                                LIMIT {N2})"""
+            con = duckdb.connect()    
+            print(query)
+            df = con.query(query).df()     
+            con.close()            
         print( 'Before calling extract:', df.head(3) )
         return extract(df, feature)          
     return list(map(get_data, targets))
@@ -156,23 +147,23 @@ def fit_models(df):
     return VotingModel(fitted_models)    
 #if __name__ != "__main__":  # called when imported
 if 1:                      
+    trial_name = f'{feature}_N{N}-{N2}_nEst{NE}_nEpo{NEPOCHS}'
+    d = pd.DataFrame(data={feature: [N, N2, NE, NEPOCHS] } )
+    d.to_json( trial_name + '.json'); print( '\n\n', d )
     test_file = os.path.dirname(test_path) + '/test.csv'    
     feat_functions = {'ecfp': generate_ecfp, 'ais':generate_ais }         
     if ('data' in globals())==False:               
         tqdm.pandas()  # enable progress_apply   
         targets = ['BRD4', 'sEH', 'HSA']                
         if DEBUG:            
-            N, N2, NE, NEPOCHS = 100,300,10,5            
+            N, N2, NE, NEPOCHS = 100,300,10,5          
             print( 'num of ests + adjusted to mini training set')            
         tm_start = timeit.default_timer()        
-        
-        data = get_train_set( feature, N=N, N2=N2)               
-        
+        data = get_train_set( feature, N=N, N2=N2)        
         data = dict(zip(targets, data))            
         tm_end = timeit.default_timer()
         rtime = (tm_end - tm_start)/ 60
         print( f'\n\n********* Reading completed in {rtime:.2f} min. *********' )        
-
 if ('TRAIN' in globals())==False:
     TRAIN = True
 if TRAIN:   
@@ -189,17 +180,13 @@ if TRAIN:
         "colsample_bynode": 0.8,
         "verbose": -1,
         "random_state": 42,}
-        
-    import tensorflow as tf
     gpus = tf.config.experimental.list_physical_devices('GPU')  
     if len(gpus):
         params.update( {"device": "gpu",})
  
     tm_start = timeit.default_timer()
     print( '\n\n********* Training begins...' )
-    models = {k: fit_models(v) for k, v in data.items()}
-        
+    models = {k: fit_models(v) for k, v in data.items()}        
     tm_end = timeit.default_timer()        
     rtime = (tm_end - tm_start)/ 60
     print( f'\n\n********* Training completed in {rtime:.2f}*********' )
-     
