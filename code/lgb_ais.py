@@ -155,9 +155,7 @@ def fit_models(df):
         fitted_models.append(model)
     return VotingModel(fitted_models)    
 #if __name__ != "__main__":  # called when imported
-if 1:            
-    train_path = '/project/def-lisat-ab/lisat/leash/data/train.parquet'
-    test_path = '/project/def-lisat-ab/lisat/leash/data/test.parquet '
+if 1:              
     if ~os.path.isfile( train_path ):
         train_path = '/kaggle/input/leash-BELKA/train.parquet'
         test_path = '/kaggle/input/leash-BELKA/test.parquet'            
