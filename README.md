@@ -120,3 +120,13 @@ df = pa.Table.from_batches([first_ten_rows]).to_pandas()
 df.head()
 ```
 
+
+<details>
+<summary>R</summary>
+  
+```
+install.packages("devtools")
+devtools::install_github("fangzhou-xie/rethnicity")
+```
+  
+</details>
