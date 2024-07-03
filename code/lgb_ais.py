@@ -169,15 +169,16 @@ if 1:
             print( 'num of ests + adjusted to mini training set')            
         tm_start = timeit.default_timer()        
         
-        data = get_train_set( feature, N=N, N2=N2)    
-           
+        data = get_train_set( feature, N=N, N2=N2)               
         
         data = dict(zip(targets, data))            
         tm_end = timeit.default_timer()
         rtime = (tm_end - tm_start)/ 60
         print( f'\n\n********* Reading completed in {rtime:.2f} min. *********' )        
-        
-if 1:   
+
+if ('TRAIN' in globals())==False:
+    TRAIN = True
+if TRAIN:   
     # Split the data into train and test sets
     skf = StratifiedKFold(n_splits=3, shuffle=False)
     params = {
