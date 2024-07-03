@@ -27,6 +27,10 @@ import optuna
 from rdkit.Chem import MolFromSmiles, MolToSmiles
 import atomInSmiles
 
+import sentencepiece as spm        
+import sys, os
+import requests 
+
 def center_pad( a, N=500 ):   
     m = len(a)    
     n = np.abs(N - m)//2 
@@ -34,25 +38,16 @@ def center_pad( a, N=500 ):
     #if (N-len(p))>0:
     #    p=[0]+p
     return p #np.asarray(p, dtype=np.int32)
-feature = 'ais'
-N,N2,DEBUG = 20000,30000,0
-N,N2,DEBUG = 200,300,0
-NEPOCHS, NE = 10, 100 
+
 
 if feature == 'ais':
-    try:
-        import sentencepiece as spm
-    except:
-        import sentencepiece as spm
-        
-    import sys, os
     sys.path.append( '/kaggle/working/atom-in-SMILES/atomInSmiles')
     sys.path.append( '/kaggle/working/atom-in-SMILES/')
     sys.path.append( '/kaggle/working/atom-in-SMILES/utils')
     
     # train sentencepiece model from `botchan.txt` and makes `m.model` and `m.vocab`
     # `m.vocab` is just a reference. not used in the segmentation.
-    import requests 
+    
     r = requests.get('https://raw.githubusercontent.com/google/sentencepiece/master/data/botchan.txt' )
     if r.status_code == 200:
         with open("botchan.txt", "wb") as file:
