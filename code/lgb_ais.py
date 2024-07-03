@@ -156,10 +156,6 @@ def fit_models(df):
     return VotingModel(fitted_models)    
 #if __name__ != "__main__":  # called when imported
 if 1:                      
-    if ( 'train_path' in globals() )==False & ~os.path.isfile( train_path ):
-        train_path = '/kaggle/input/leash-BELKA/train.parquet'
-        test_path = '/kaggle/input/leash-BELKA/test.parquet'            
-        
     test_file = os.path.dirname(test_path) + '/test.csv'    
     feat_functions = {'ecfp': generate_ecfp, 'ais':generate_ais }         
     if ('data' in globals())==False:               
