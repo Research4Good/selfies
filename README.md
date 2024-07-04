@@ -45,6 +45,15 @@ except:
   gpus = tf.config.experimental.list_physical_devices('GPU')  
 ```
 
+
+#### Fast Parquet 
+
+```
+from fastparquet import write
+write('outfile.parq', df)
+write('outfile2.parq', df, row_group_offsets=[0, 10000, 20000],
+      compression='GZIP', file_scheme='hive')
+```
 #### GPU specification
 
 - https://docs.alliancecan.ca/wiki/Using_GPUs_with_Slurm/en
