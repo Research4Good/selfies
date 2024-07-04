@@ -16,7 +16,7 @@ python setup.py install
 
 pip install deepchem
 ```
-
+ 
 ### CPU
 
 #### Inspect the specs of each core
