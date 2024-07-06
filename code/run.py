@@ -1447,8 +1447,22 @@ def main(data_smiles,
                                                                              ignore_first_epochs=ignore_first_epochs,
                                                                              last=last)
                         logcallback = trainutils.LoggingCallback(print_fcn=logging.info,verbose=train_verbose)
+                        
+                                                
                         # Default callback list
                         callbacks_list = [ignorebeginning, logcallback]
+                        callbacks_list.append(
+                            tf.keras.callbacks.EarlyStopping(
+                            monitor='val_loss',
+                            min_delta=0,
+                            patience=0,
+                            verbose=0,
+                            mode='auto',
+                            baseline=None,
+                            restore_best_weights=False,
+                            start_from_epoch=0
+                            )
+                        )
                         with strategy.scope():
                             if i == 0:
                                 logging.info("The batch size is initialized at {}".format(batch_size))
