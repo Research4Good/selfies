@@ -454,7 +454,22 @@ def learning_curve(train_loss, val_loss, save_dir: str, data_name: str, ifold: i
                 .format(save_dir, data_name, ifold, run), bbox_inches='tight')
     plt.close()
     
-    
+from keras import backend as K
+def recall_m(y_true, y_pred):
+    true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+    possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
+    recall = true_positives / (possible_positives + K.epsilon())
+    return recall
+def precision_m(y_true, y_pred):
+    true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+    predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
+    precision = true_positives / (predicted_positives + K.epsilon())
+    return precision
+def f1_m(y_true, y_pred):
+    precision = precision_m(y_true, y_pred)
+    recall = recall_m(y_true, y_pred)
+    return 2*((precision*recall)/(precision+recall+K.epsilon()))
+
 ## Compute diverse scores to quantify model's performance on classification tasks
 def classification_metrics(y_true, y_pred):
 
@@ -1422,7 +1437,7 @@ def main(data_smiles,
                         custom_adam = Adam(learning_rate=math.pow(10,-float(hyper_opt["Learning rate"])))
                         # model_train.compile(loss=model_loss, optimizer=custom_adam, metrics=model_metrics)
 
-                        model_train.compile(loss=model_loss, optimizer='sgd', metrics= [negate_acc] )
+                        model_train.compile(loss=model_loss, optimizer='sgd', metrics= ['acc','FBetaScore'] )
                     
                     if (nfold==0 and run==0):
                         logging.info("Model summary:")
