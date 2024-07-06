@@ -481,22 +481,27 @@ def classification_metrics(y_true, y_pred):
 def negate_acc(y_true, y_pred):
 
     # Compute the average class predictions for binary classification
-    y_pred_class = (y_pred > 0.5).astype("int8")
+    y_pred_class = tf.cast( y_pred, tf.int8 ) 
 
-    y_true = y_true.astype("int8")
-    # accuracy: (tp + tn) / (p + n)
-    accuracy = accuracy_score(y_true, y_pred_class)
+    y_true = tf.cast( y_true, tf.int8 )
+    
     # precision tp / (tp + fp)
     precision = precision_score(y_true, y_pred_class)
+    
     # recall: tp / (tp + fn)
     recall = recall_score(y_true, y_pred_class)
-    # f1: 2 tp / (2 tp + fp + fn)
-    f1 = f1_score(y_true, y_pred_class)
-    # AUC
-    prp_precision, prp_recall, _ = precision_recall_curve(y_true, y_pred)
-    prp_auc = auc(prp_recall, prp_precision)
-    # confusion matrix
-    conf_mat = confusion_matrix(y_true, y_pred_class)
+
+    if 0:
+        # accuracy: (tp + tn) / (p + n)
+        accuracy = accuracy_score(y_true, y_pred_class)    
+        # f1: 2 tp / (2 tp + fp + fn)
+        f1 = f1_score(y_true, y_pred_class)
+        # AUC
+        prp_precision, prp_recall, _ = precision_recall_curve(y_true, y_pred)
+        prp_auc = auc(prp_recall, prp_precision)
+        
+        # confusion matrix
+        conf_mat = confusion_matrix(y_true, y_pred_class)
     
     return 1 - (precision + recall)/2
     
