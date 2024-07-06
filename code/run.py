@@ -1818,7 +1818,8 @@ print( '\n\n\n>>>>>>>>>>>>>>NGPUs',NGPUS )
 main(data_smiles=X['trn'][ F ],    # SMILES input
           data_extra=X['trn'][ E ],                # Aux input 
           data_prop= Y['trn'],                     # prediction
-          
+          bs_ref = BS,
+          lr_ref = LR,
           data_label=data_label,
           smiles_concat=False,                     # was true in demo 
           geomopt_mode='off',                      #  'off' <-- was off in demo code: Zero-cost geometry optimization
